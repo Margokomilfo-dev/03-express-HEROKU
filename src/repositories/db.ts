@@ -5,7 +5,7 @@ import {BloggerType} from './bloggers-repository'
 const mongoUri = process.env.mongoURI || "mongodb://0.0.0.0:27017";
 
 export const client = new MongoClient(mongoUri);
-const connection = client.db("myBd")
+const connection = client.db("express")
 
 export const posts = connection.collection<PostType>('posts')
 export const bloggers = connection.collection<BloggerType>('bloggers')
