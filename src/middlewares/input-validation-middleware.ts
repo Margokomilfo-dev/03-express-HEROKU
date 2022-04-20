@@ -10,11 +10,17 @@ export const inputValidationMiddleware = (req: Request, res: Response, next: Nex
             resultCode: 1,
             errorsMessages: errors.array().map((e)=> ({
                 message: e.msg,
-                field: e.msg
+                field: e.param
             }))})
     } else {
         next()
     }
+}
+
+export const getQueryPaginationFromQueryString = (req: Request) => {
+    const pageNumber = req.query.PageNumber && typeof (req.query.PageNumber) === 'string' && (isFinite(parseInt(req.query.PageNumber))) ? parseInt(req.query.PageNumber) : 1
+    const pageSize = req.query.PageSize && typeof (req.query.PageSize) === 'string' && (isFinite(parseInt(req.query.PageSize))) ? parseInt(req.query.PageSize) : 10
+    return {pageNumber, pageSize}
 }
 
 const regexp =  new RegExp('^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$')
@@ -30,4 +36,5 @@ export const contentValidation = body('content').trim().isLength({min: 2, max: 3
     .withMessage('content is required and its length should be 3-33 symbols')
 export const bloggerIdValidation = body('bloggerId').isNumeric()
     .withMessage('bloggerId is required and its number')
+
 

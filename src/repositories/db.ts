@@ -13,15 +13,13 @@ export const bloggers = connection.collection<BloggerType>('bloggers')
 export async function runDb() {
     try {
         // Connect the client to the server
-        console.log(process.env.mongoURI)
         await client.connect();
         // Establish and verify connection
         await client.db("products").command({ ping: 1 });
         console.log("Connected successfully to mongo server");
 
-    } catch (e){
+    } catch {
         console.log("Can't connect to db");
-        console.log(e)
         // Ensures that the client will close when you finish/error
         await client.close();
     }

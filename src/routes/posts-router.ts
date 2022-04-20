@@ -1,17 +1,20 @@
 import {Request, Response, Router} from 'express'
-import {postRepository} from '../repositories/posts-db-repository'
+
+
 import {bloggersRepository} from '../repositories/bloggers-db-repository'
 import {
     bloggerIdValidation,
-    contentValidation, inputValidationMiddleware,
+    contentValidation, getQueryPaginationFromQueryString, inputValidationMiddleware,
     shortDescriptionValidation,
     titleValidation
 } from '../middlewares/input-validation-middleware'
+import {postService} from '../bll-domain/posts-service'
 
 export const postsRouter = Router({})
 
 postsRouter.get('/', async (req: Request, res: Response) => {
-    const posts = await postRepository.getPosts()
+    const params = getQueryPaginationFromQueryString(req)
+    const posts = await postService.getPosts(params.pageNumber, params.pageSize)
     res.status(200).send(posts)
 })
 postsRouter.post('/',
@@ -29,18 +32,18 @@ postsRouter.post('/',
             res.status(400).send({
                 data: {},
                 resultCode: 1,
-                errorsMessages: [{message: 'no blogger with this id', field: '-'}]
+                errorsMessages: [{message: 'no blogger with this id', field: 'bloggerId'}]
             })
             return
         }
-        const newPost = await postRepository.createPost(title, shortDescription, content, bloggerId)
+        const newPost = await postService.createPost(title, shortDescription, content, bloggerId)
         if (newPost) {
             res.status(201).send(newPost)
         } else {
             res.status(400).send({
                 data: {},
                 resultCode: 1,
-                errorsMessages: [{message: 'post is not created', field: '-'}]
+                errorsMessages: [{message: 'post is not created', field: 'bloggerId'}]
             })
         }
     })
@@ -50,7 +53,7 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
         res.send(400)
         return
     }
-    const post = await postRepository.getPostById(id)
+    const post = await postService.getPostById(id)
     if (post) {
         res.send(post)
     } else {
@@ -78,7 +81,7 @@ postsRouter.put('/:id',
             res.sendStatus(400)
             return
         }
-        const isUpdated = await postRepository.updatePost(id, title, shortDescription, content, bloggerId)
+        const isUpdated = await postService.updatePost(id, title, shortDescription, content, bloggerId, blogger.name)
         if (isUpdated) {
             res.sendStatus(204)
         } else res.send(404)
@@ -89,7 +92,7 @@ postsRouter.delete('/:id', async (req: Request, res: Response) => {
         res.send(400)
         return
     }
-    const isDeleted = await postRepository.deletePost(id)
+    const isDeleted = await postService.deletePost(id)
     if (isDeleted) {
         res.send(204)
     } else res.send(404)
