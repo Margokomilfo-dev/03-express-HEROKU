@@ -1,5 +1,6 @@
 import {bloggers} from './db'
 import {BloggerType} from './bloggers-repository'
+import {postRepository} from './posts-db-repository'
 
 export const bloggersRepository = {
 
@@ -33,12 +34,13 @@ export const bloggersRepository = {
             {id},
             {$set: {name, youtubeUrl: url}},
             {upsert: true})
+        await postRepository.updatePosts(id, name)
         return !!myBlogger
     },
 
     async deleteBlogger(id: number) {
+        await postRepository.deletePosts(id)
         const deleted = await bloggers.deleteOne({id})
         return deleted.deletedCount > 0;
     }
-
 }

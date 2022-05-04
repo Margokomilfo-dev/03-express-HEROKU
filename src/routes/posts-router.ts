@@ -30,7 +30,6 @@ postsRouter.post('/',
         const blogger = await bloggersRepository.findBloggerById(bloggerId)
         if (!blogger) {
             res.status(400).send({
-                data: {},
                 resultCode: 1,
                 errorsMessages: [{message: 'no blogger with this id', field: 'bloggerId'}]
             })
@@ -41,7 +40,6 @@ postsRouter.post('/',
             res.status(201).send(newPost)
         } else {
             res.status(400).send({
-                data: {},
                 resultCode: 1,
                 errorsMessages: [{message: 'post is not created', field: 'bloggerId'}]
             })

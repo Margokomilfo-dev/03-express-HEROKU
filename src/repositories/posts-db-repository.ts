@@ -35,9 +35,20 @@ export const postRepository = {
         )
         return true
     },
+    async updatePosts(bloggerId: number, bloggerName: string) {
+        await posts.updateMany(
+            {bloggerId},
+            {$set: {bloggerName}},
+            {upsert: true}
+        )
+        return true
+    },
 
     async deletePost(id: number) {
         const isDeleted = await posts.deleteOne({id})
         return isDeleted.deletedCount > 0
+    },
+    async deletePosts(bloggerId: number) {
+        await posts.deleteMany({bloggerId})
     }
 }

@@ -1,13 +1,14 @@
 import {Request, Response, Router} from 'express'
-
 import {
+    auth, contentValidation,
     getQueryPaginationFromQueryString,
     inputValidationMiddleware,
-    nameValueValidation,
-    youtubeUrlValidation
+    nameValueValidation, shortDescriptionValidation, titleValidation,
+    youtubeUrlValidation1, youtubeUrlValidation2
 } from '../middlewares/input-validation-middleware'
 import {bloggersService} from '../bll-domain/bloggers-service'
 import {postService} from '../bll-domain/posts-service'
+import {postRepository} from '../repositories/posts-db-repository'
 export const bloggersRouter = Router({})
 
 bloggersRouter.get('/', async (req: Request, res: Response) => {
@@ -16,36 +17,6 @@ bloggersRouter.get('/', async (req: Request, res: Response) => {
     const bloggers = await bloggersService.findBloggers(params.pageNumber, params.pageSize, searchName)
     res.status(200).send(bloggers)
 })
-bloggersRouter.get('/:bloggerId/posts', async (req: Request, res: Response) => {
-    const bloggerId = parseInt(req.params.bloggerId)
-    const params = getQueryPaginationFromQueryString(req)
-    const blogger = await bloggersService.findBloggerById(bloggerId)
-    if(!blogger){
-        res.send(404)
-        return
-    }
-    const postsByBloggerId = await postService.getPostsByBloggerId(params.pageNumber,params.pageSize, bloggerId)
-    res.status(200).send(postsByBloggerId)
-})
-
-bloggersRouter.post('/',
-    nameValueValidation,
-    youtubeUrlValidation,
-    inputValidationMiddleware, async (req: Request, res: Response) => {
-        const name = req.body.name
-        const youtubeUrl = req.body.youtubeUrl
-        const blogger = await bloggersService.createBlogger(name, youtubeUrl)
-
-        if (blogger) {
-            res.status(201).send(blogger)
-        } else {
-            res.status(400).send({
-                data: {},
-                resultCode: 1,
-                errorsMessages: [{message: 'blogger is not created', field: 'bloggerId'}]
-            })
-        }
-    })
 bloggersRouter.get('/:id', async (req: Request, res: Response) => {
     const id = +req.params.id
     if (!id) {
@@ -60,9 +31,68 @@ bloggersRouter.get('/:id', async (req: Request, res: Response) => {
     }
 
 })
-bloggersRouter.put('/:id',
+bloggersRouter.get('/:bloggerId/posts', async (req: Request, res: Response) => {
+    const bloggerId = parseInt(req.params.bloggerId)
+    const params = getQueryPaginationFromQueryString(req)
+    const blogger = await bloggersService.findBloggerById(bloggerId)
+    if(!blogger){
+        res.send(404)
+        return
+    }
+    const postsByBloggerId = await postService.getPostsByBloggerId(params.pageNumber,params.pageSize, bloggerId)
+    res.status(200).send(postsByBloggerId)
+})
+
+bloggersRouter.post('/',auth,
     nameValueValidation,
-    youtubeUrlValidation,
+    youtubeUrlValidation1,
+    youtubeUrlValidation2,
+    inputValidationMiddleware, async (req: Request, res: Response) => {
+        const name = req.body.name
+        const youtubeUrl = req.body.youtubeUrl
+        const blogger = await bloggersService.createBlogger(name, youtubeUrl)
+
+        if (blogger) {
+            res.status(201).send(blogger)
+        } else {
+            res.status(400).send({
+                resultCode: 1,
+                errorsMessages: [{message: 'blogger is not created', field: 'bloggerId'}]
+            })
+        }
+    })
+
+bloggersRouter.post('/:bloggerId/posts',auth,
+    titleValidation,
+    shortDescriptionValidation,
+    contentValidation,
+    nameValueValidation,
+    inputValidationMiddleware, async (req: Request, res: Response) => {
+        const title = req.body.title
+        const shortDescription = req.body.shortDescription
+        const content = req.body.content
+        const bloggerId = req.body.bloggerId
+        const blogger = await bloggersService.findBloggerById(bloggerId)
+        if(!blogger){
+            res.send(404)
+            return
+        }
+
+        if (blogger) {
+            const post = await postService.createPost(title, shortDescription, content, bloggerId)
+            res.status(201).send(post)
+        } else {
+            res.status(400).send({
+                resultCode: 1,
+                errorsMessages: [{message: 'post is not created', field: 'postId'}]
+            })
+        }
+    })
+
+bloggersRouter.put('/:id',auth,
+    nameValueValidation,
+    youtubeUrlValidation1,
+    youtubeUrlValidation2,
     inputValidationMiddleware, async (req: Request, res: Response) => {
         const id = parseInt(req.params.id)
         if (!id) {
@@ -77,7 +107,8 @@ bloggersRouter.put('/:id',
             res.sendStatus(204)
         } else res.send(404)
     })
-bloggersRouter.delete('/:id', async (req: Request, res: Response) => {
+
+bloggersRouter.delete('/:id', auth, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id)
     if (!id) {
         res.send(400)
