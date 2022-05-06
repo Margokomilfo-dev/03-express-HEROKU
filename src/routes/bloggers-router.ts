@@ -1,14 +1,18 @@
 import {Request, Response, Router} from 'express'
 import {
-    auth, contentValidation,
+    auth,
+    contentValidation,
     getQueryPaginationFromQueryString,
     inputValidationMiddleware,
-    nameValueValidation, shortDescriptionValidation, titleValidation,
-    youtubeUrlValidation1, youtubeUrlValidation2
+    nameValueValidation,
+    shortDescriptionValidation,
+    titleValidation,
+    youtubeUrlValidation1,
+    youtubeUrlValidation2
 } from '../middlewares/input-validation-middleware'
 import {bloggersService} from '../bll-domain/bloggers-service'
 import {postService} from '../bll-domain/posts-service'
-import {postRepository} from '../repositories/posts-db-repository'
+
 export const bloggersRouter = Router({})
 
 bloggersRouter.get('/', async (req: Request, res: Response) => {
@@ -71,7 +75,7 @@ bloggersRouter.post('/:bloggerId/posts',auth,
         const title = req.body.title
         const shortDescription = req.body.shortDescription
         const content = req.body.content
-        const bloggerId = req.body.bloggerId
+        const bloggerId = parseInt(req.params.bloggerId)
         const blogger = await bloggersService.findBloggerById(bloggerId)
         if(!blogger){
             res.send(404)
