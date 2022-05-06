@@ -4,12 +4,12 @@ import {BloggerType} from '../repositories/bloggers-repository'
 export const bloggersService = {
     async findBloggers(pageNumber:number, pageSize:number,SearchNameTerm: string | undefined) {
         const foundBloggers = await bloggersRepository.findBloggers(pageNumber,pageSize,SearchNameTerm)
-        const allBloggers = await bloggersRepository.getAllBloggers()
+        // const allBloggers = await bloggersRepository.getAllBloggers()
         return {
-            pagesCount: Math.ceil(allBloggers.length / pageSize),
+            pagesCount: Math.ceil(foundBloggers.length / pageSize),
             page: pageNumber,
             pageSize: pageSize,
-            totalCount: allBloggers.length,
+            totalCount: foundBloggers.length,
             items: foundBloggers
         }
     },
