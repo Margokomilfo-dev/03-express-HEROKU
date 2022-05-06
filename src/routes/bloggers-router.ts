@@ -70,12 +70,13 @@ bloggersRouter.post('/:bloggerId/posts',auth,
     titleValidation,
     shortDescriptionValidation,
     contentValidation,
-    nameValueValidation,
     inputValidationMiddleware, async (req: Request, res: Response) => {
+        const bloggerId = parseInt(req.params.bloggerId)
+
         const title = req.body.title
         const shortDescription = req.body.shortDescription
         const content = req.body.content
-        const bloggerId = parseInt(req.params.bloggerId)
+
         const blogger = await bloggersService.findBloggerById(bloggerId)
         if(!blogger){
             res.send(404)
