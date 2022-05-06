@@ -10,6 +10,7 @@ import {
     titleValidation
 } from '../middlewares/input-validation-middleware'
 import {postService} from '../bll-domain/posts-service'
+import {postRepository} from '../repositories/posts-db-repository'
 
 export const postsRouter = Router({})
 
@@ -59,7 +60,7 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
         res.send(404)
     }
 })
-postsRouter.put('/:id', auth,
+postsRouter.put('/:id',auth,
     titleValidation,
     shortDescriptionValidation,
     contentValidation,
@@ -74,13 +75,15 @@ postsRouter.put('/:id', auth,
         const shortDescription = req.body.shortDescription
         const content = req.body.content
         const bloggerId = req.body.bloggerId
-
         const blogger = await bloggersRepository.findBloggerById(bloggerId)
         if (!blogger) {
-            res.sendStatus(400)
+            res.status(400).send({
+                resultCode: 1,
+                errorsMessages: [{message: 'blogger is not created', field: 'bloggerId'}]
+            })
             return
         }
-        const isUpdated = await postService.updatePost(id, title, shortDescription, content, bloggerId, blogger.name)
+        const isUpdated = await postRepository.updatePost(id, title, shortDescription, content, bloggerId,blogger.name )
         if (isUpdated) {
             res.sendStatus(204)
         } else res.send(404)
