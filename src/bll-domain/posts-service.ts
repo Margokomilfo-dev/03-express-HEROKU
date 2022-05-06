@@ -19,13 +19,13 @@ export const postService = {
         return postRepository.getAllPosts()
     },
     async getPostsByBloggerId(pageNumber:number, pageSize:number,bloggerId: number): Promise<any> {
-        const allPostsByBloggerId= await postRepository.getAllPostsByBloggerId(bloggerId)
+        // const allPostsByBloggerId= await postRepository.getAllPostsByBloggerId(bloggerId)
         const foundPosts = await postRepository.getPostsByBloggerId(pageNumber, pageSize,bloggerId)
         return {
-            pagesCount: Math.ceil(allPostsByBloggerId.length / pageSize),
+            pagesCount: Math.ceil(foundPosts.length / pageSize),
             page: pageNumber,
             pageSize: pageSize,
-            totalCount: allPostsByBloggerId.length,
+            totalCount: foundPosts.length,
             items: foundPosts
         }
 

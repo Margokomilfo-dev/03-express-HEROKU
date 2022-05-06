@@ -3,6 +3,7 @@ import {Request, Response, Router} from 'express'
 
 import {bloggersRepository} from '../repositories/bloggers-db-repository'
 import {
+    auth,
     bloggerIdValidation,
     contentValidation, getQueryPaginationFromQueryString, inputValidationMiddleware,
     shortDescriptionValidation,
@@ -17,7 +18,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     const posts = await postService.getPosts(params.pageNumber, params.pageSize)
     res.status(200).send(posts)
 })
-postsRouter.post('/',
+postsRouter.post('/', auth,
     titleValidation,
     shortDescriptionValidation,
     contentValidation,
@@ -58,7 +59,7 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
         res.send(404)
     }
 })
-postsRouter.put('/:id',
+postsRouter.put('/:id', auth,
     titleValidation,
     shortDescriptionValidation,
     contentValidation,
@@ -84,7 +85,7 @@ postsRouter.put('/:id',
             res.sendStatus(204)
         } else res.send(404)
     })
-postsRouter.delete('/:id', async (req: Request, res: Response) => {
+postsRouter.delete('/:id', auth, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id)
     if (!id) {
         res.send(400)
