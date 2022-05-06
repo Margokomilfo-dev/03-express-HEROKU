@@ -12,8 +12,12 @@ export const bloggersRepository = {
        return bloggers.find(filter, {projection:{_id:0}}).skip(pageSize*(pageNumber-1)).limit(pageSize).toArray()
     },
 
-    async getAllBloggers(): Promise<Array<BloggerType>> {
-        return bloggers.find({}).toArray()
+    async getAllBloggers(SearchNameTerm: string | undefined ): Promise<Array<BloggerType>> {
+        let filter = {}
+        if (SearchNameTerm) {
+            filter = {name: {$regex: SearchNameTerm}}
+        }
+        return bloggers.find(filter).toArray()
 
     },
     async createBlogger(newBlogger: BloggerType): Promise<BloggerType | null> {

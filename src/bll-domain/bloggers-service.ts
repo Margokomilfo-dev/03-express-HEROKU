@@ -4,20 +4,16 @@ import {BloggerType} from '../repositories/bloggers-repository'
 export const bloggersService = {
     async findBloggers(pageNumber:number, pageSize:number,SearchNameTerm: string | undefined) {
         const foundBloggers = await bloggersRepository.findBloggers(pageNumber,pageSize,SearchNameTerm)
-        // const allBloggers = await bloggersRepository.getAllBloggers()
+        const allBloggers = await bloggersRepository.getAllBloggers(SearchNameTerm)
         return {
-            pagesCount: Math.ceil(foundBloggers.length / pageSize),
+            pagesCount: Math.ceil(allBloggers.length / pageSize),
             page: pageNumber,
             pageSize: pageSize,
-            totalCount: foundBloggers.length,
+            totalCount: allBloggers.length,
             items: foundBloggers
         }
     },
 
-    async getAllBloggers(): Promise<Array<BloggerType>> {
-        return bloggersRepository.getAllBloggers()
-
-    },
     async createBlogger(name: string, url: string): Promise<BloggerType | null> {
         const newBlogger: BloggerType = {
             id: +(new Date()),
