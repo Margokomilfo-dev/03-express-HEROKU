@@ -5,8 +5,8 @@ export const postRepository = {
     async getPosts(pageNumber:number, pageSize:number,) {
         return posts.find({}, {projection:{_id:0}}).skip(pageSize*(pageNumber-1)).limit(pageSize).toArray()
     },
-    async getAllPosts() {
-        return posts.find({}).toArray()
+    async getAllPostsCount(): Promise<number> {
+        return posts.countDocuments()
     },
     async getPostsByBloggerId(pageNumber:number, pageSize:number,bloggerId: number): Promise<any> {
         return posts.find({bloggerId}, {projection:{_id:0}}).skip(pageSize*(pageNumber-1)).limit(pageSize).toArray()
@@ -45,8 +45,7 @@ export const postRepository = {
     },
 
     async deletePost(id: number) {
-        const isDeleted = await posts.deleteOne({id})
-        return isDeleted.deletedCount > 0
+       return posts.findOneAndDelete({id})
     },
     async deletePosts(bloggerId: number) {
         await posts.deleteMany({bloggerId})

@@ -5,18 +5,14 @@ import {bloggersRepository} from '../repositories/bloggers-db-repository'
 export const postService = {
     async getPosts(pageNumber:number, pageSize:number) {
         const foundPosts = await postRepository.getPosts(pageNumber, pageSize)
-        const allPosts = await postRepository.getAllPosts()
+        const allPostsCount = await postRepository.getAllPostsCount()
         return {
-            pagesCount: Math.ceil(allPosts.length / pageSize),
+            pagesCount: Math.ceil(allPostsCount / pageSize),
             page: pageNumber,
             pageSize: pageSize,
-            totalCount: allPosts.length,
+            totalCount: allPostsCount,
             items: foundPosts
         }
-    },
-
-    async getAllPosts() {
-        return postRepository.getAllPosts()
     },
     async getPostsByBloggerId(pageNumber:number, pageSize:number,bloggerId: number): Promise<any> {
         const allPostsByBloggerId= await postRepository.getAllPostsByBloggerId(bloggerId)

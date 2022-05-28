@@ -12,12 +12,12 @@ export const bloggersRepository = {
        return bloggers.find(filter, {projection:{_id:0}}).skip(pageSize*(pageNumber-1)).limit(pageSize).toArray()
     },
 
-    async getAllBloggers(SearchNameTerm: string | undefined ): Promise<Array<BloggerType>> {
+    async getAllBloggersCount(SearchNameTerm: string | undefined ): Promise<number> {
         let filter = {}
         if (SearchNameTerm) {
             filter = {name: {$regex: SearchNameTerm}}
         }
-        return bloggers.find(filter).toArray()
+        return bloggers.countDocuments(filter)
 
     },
     async createBlogger(newBlogger: BloggerType): Promise<BloggerType | null> {
@@ -43,7 +43,7 @@ export const bloggersRepository = {
     },
 
     async deleteBlogger(id: number) {
-        await postRepository.deletePosts(id)
+        // await postRepository.deletePosts(id)
         const deleted = await bloggers.deleteOne({id})
         return deleted.deletedCount > 0;
     }
