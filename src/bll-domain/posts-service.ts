@@ -54,6 +54,9 @@ export const postService = {
     },
 
     async deletePost(id: number) {
-        return await postRepository.deletePost(id)
+        const res = await postRepository.deletePost(id)
+        // console.log(res.value) //null or object
+        // console.log(res.ok) // always 1
+        return res.value !== null
     }
 }
