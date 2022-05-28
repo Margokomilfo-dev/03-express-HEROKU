@@ -43,7 +43,7 @@ export const bloggersRepository = {
     },
 
     async deleteBlogger(id: number) {
-        // await postRepository.deletePosts(id)
+        await postRepository.deletePosts(id)
         const deleted = await bloggers.deleteOne({id})
         return deleted.deletedCount > 0;
     }
