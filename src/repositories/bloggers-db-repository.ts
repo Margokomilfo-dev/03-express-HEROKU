@@ -38,7 +38,10 @@ export const bloggersRepository = {
             {id},
             {$set: {name, youtubeUrl: url}},
             {upsert: true})
-        await postRepository.updatePosts(id, name)
+        const posts = await postRepository.getAllPostsByBloggerId(id)
+        if (posts.length){
+            await postRepository.updatePosts(id, name)
+        }
         return !!myBlogger
     },
 
